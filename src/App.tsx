@@ -444,14 +444,17 @@ export default function App() {
             />
           )}
 
-          {/* TAB 4: Saved Tours */}
+          {/* TAB 4: Bookings & Saved Tours */}
           {currentTab === 'trips' && (
             <TripsTab
-              savedTours={tourPackages.filter(p => p.saved)}
+              bookings={bookings}
+              savedTours={savedTours}
               onOpenTourDetails={(tour) => {
                 setSelectedTour(tour);
                 setIsTourModalOpen(true);
               }}
+              onCancelBooking={handleCancelBooking}
+              onDownloadVoucher={handleDownloadVoucher}
               onToggleSaveTour={handleToggleSaveTour}
               onSelectTab={setCurrentTab}
               language={language}
@@ -498,7 +501,8 @@ export default function App() {
         <BottomNavBar
           activeTab={currentTab}
           onSelectTab={setCurrentTab}
-          savedTripsCount={tourPackages.filter(p => p.saved).length}
+          savedTripsCount={savedTours.length}
+          bookingsCount={bookings.length}
           language={language}
           theme={theme}
         />
@@ -508,7 +512,7 @@ export default function App() {
           tour={selectedTour}
           isOpen={isTourModalOpen}
           onClose={() => setIsTourModalOpen(false)}
-          onBook={() => setIsTourModalOpen(false)}
+          onBook={handleBookTour}
           language={language}
           theme={theme}
         />

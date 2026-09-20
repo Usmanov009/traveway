@@ -1,10 +1,14 @@
-import React from 'react';
-import { Bookmark, MapPin, Plane, Info, Trash2 } from 'lucide-react';
-import { TourPackage, Language, ThemeMode, TabType } from '../../types';
+import React, { useState } from 'react';
+import { Download, Trash2, Calendar, MapPin, Ticket, Bookmark, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { Booking, TourPackage, Language, ThemeMode, TabType } from '../../types';
+import { translations } from '../../data/translations';
 
 interface TripsTabProps {
+  bookings: Booking[];
   savedTours: TourPackage[];
   onOpenTourDetails: (tour: TourPackage) => void;
+  onCancelBooking: (id: string) => void;
+  onDownloadVoucher: (voucherId: string) => void;
   onToggleSaveTour: (id: string) => void;
   onSelectTab: (tab: TabType) => void;
   language: Language;
@@ -12,123 +16,207 @@ interface TripsTabProps {
 }
 
 export const TripsTab: React.FC<TripsTabProps> = ({
+  bookings,
   savedTours,
   onOpenTourDetails,
+  onCancelBooking,
+  onDownloadVoucher,
   onToggleSaveTour,
   onSelectTab,
   language,
   theme
 }) => {
+  const t = translations[language];
   const isDark = theme === 'dark';
+  const [subTab, setSubTab] = useState<'active' | 'saved'>('active');
 
   return (
     <div className="space-y-4 pb-20">
       
-      {/* Header */}
-      <div className={`p-4 rounded-3xl border shadow-lg ${
-        isDark ? 'bg-[#111c30] border-[#1e2f4d]' : 'bg-white border-slate-200'
+      {/* Sub Tabs Switcher: Bronlarim vs Saqlanganlar */}
+      <div className={`p-1 rounded-2xl border flex items-center shadow-sm ${
+        isDark ? 'bg-[#111a2c] border-[#202f4a]' : 'bg-slate-100 border-slate-200'
       }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-orange-500/15 text-[#ff6600] flex items-center justify-center">
-              <Bookmark size={20} className="fill-[#ff6600]" />
-            </div>
-            <div>
-              <h2 className="text-base font-black">
-                {language === 'uz' ? "Saqlangan Turpaketlar" : "Сохраненные туры"}
-              </h2>
-              <p className="text-xs text-slate-400">
-                {savedTours.length > 0 
-                  ? (language === 'uz' ? `${savedTours.length} ta saqlangan tur` : `${savedTours.length} сохраненных`)
-                  : (language === 'uz' ? "Siz hali turpaket saqlamadingiz" : "Нет сохраненных туров")}
-              </p>
-            </div>
-          </div>
-        </div>
+        <button
+          onClick={() => setSubTab('active')}
+          className={`flex-1 py-2 text-xs font-black rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 ${
+            subTab === 'active'
+              ? 'bg-[#ff6600] text-white shadow-md'
+              : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Ticket size={14} />
+          <span>{language === 'uz' ? "Bronlarim" : "Мои брони"} ({bookings.length})</span>
+        </button>
+
+        <button
+          onClick={() => setSubTab('saved')}
+          className={`flex-1 py-2 text-xs font-black rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 ${
+            subTab === 'saved'
+              ? 'bg-[#ff6600] text-white shadow-md'
+              : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Bookmark size={14} />
+          <span>{language === 'uz' ? "Saqlanganlar" : "Сохраненные"} ({savedTours.length})</span>
+        </button>
       </div>
 
-      {/* Saved list */}
-      {savedTours.length === 0 ? (
-        <div className={`p-8 text-center rounded-3xl border space-y-3 ${
-          isDark ? 'bg-[#142138] border-[#223352]' : 'bg-white border-slate-200'
-        }`}>
-          <div className="w-14 h-14 rounded-full bg-orange-500/10 text-[#ff6600] mx-auto flex items-center justify-center">
-            <Bookmark size={28} />
-          </div>
-          <h4 className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            {language === 'uz' ? "Saqlangan turlar yo'q" : "Нет сохраненных туров"}
-          </h4>
-          <p className="text-xs text-slate-400 max-w-xs mx-auto">
-            {language === 'uz' 
-              ? "Qidiruv bo'limidagi istalgan tur paket kartasidagi saqlash tugmasini bosing." 
-              : "Нажмите на иконку закладки в карточке любого тура в поиске."}
-          </p>
-          <button
-            onClick={() => onSelectTab('search')}
-            className="px-5 py-2.5 bg-[#ff6600] hover:bg-[#e65c00] text-white text-xs font-bold rounded-xl active:scale-95 shadow-md transition"
-          >
-            {language === 'uz' ? "Turpaketlarni ko'rish" : "Смотреть туры"}
-          </button>
-        </div>
-      ) : (
+      {/* 1. FAOL BRONLAR (ACTIVE BOOKINGS) */}
+      {subTab === 'active' && (
         <div className="space-y-3">
-          {savedTours.map((tour) => (
-            <div
-              key={tour.id}
-              className={`p-3.5 rounded-3xl border space-y-3 shadow-md ${
-                isDark ? 'bg-[#142138] border-[#223352]' : 'bg-white border-slate-200'
-              }`}
-            >
-              <div className="flex gap-3">
-                <img
-                  src={tour.img}
-                  alt={tour.title}
-                  className="w-20 h-20 rounded-2xl object-cover shrink-0"
-                />
-                <div className="min-w-0 flex-1 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[9px] font-black text-[#ff6600] uppercase block">
-                      {tour.tag}
+          {bookings.length === 0 ? (
+            <div className={`p-8 text-center rounded-3xl border space-y-3 ${
+              isDark ? 'bg-[#142138] border-[#223352]' : 'bg-white border-slate-200'
+            }`}>
+              <div className="w-14 h-14 rounded-full bg-orange-500/15 text-[#ff6600] mx-auto flex items-center justify-center">
+                <Ticket size={28} />
+              </div>
+              <h4 className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                {language === 'uz' ? "Faol bronlar yo'q" : "Нет активных броней"}
+              </h4>
+              <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                {language === 'uz' 
+                  ? "Tur paketlar bo'limidan o'zingizga ma'qul turni tanlang va bron qiling." 
+                  : "Выберите подходящий тур в каталоге и оформите бронирование."}
+              </p>
+              <button
+                onClick={() => onSelectTab('search')}
+                className="px-5 py-2.5 bg-[#ff6600] hover:bg-[#e65c00] text-white text-xs font-bold rounded-xl active:scale-95 shadow-md transition"
+              >
+                {language === 'uz' ? "Turpaketlarni ko'rish" : "Смотреть туры"}
+              </button>
+            </div>
+          ) : (
+            bookings.map((b) => (
+              <div
+                key={b.id}
+                className={`p-3.5 rounded-3xl border space-y-3 shadow-md ${
+                  isDark ? 'bg-[#142138] border-[#223352]' : 'bg-white border-slate-200'
+                }`}
+              >
+                {/* Booking Header */}
+                <div className={`flex items-center justify-between pb-2.5 border-b ${
+                  isDark ? 'border-[#1f2e47]' : 'border-slate-100'
+                }`}>
+                  <div className="min-w-0 pr-2">
+                    <span className="text-[9px] font-mono text-slate-400 block truncate">
+                      Vaucher ID: {b.voucherId}
                     </span>
-                    <h4 className="text-xs font-black truncate mt-0.5">
-                      {tour.title}
+                    <h4 className={`text-xs font-black truncate mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {b.tourTitle}
                     </h4>
-                    <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
-                      <MapPin size={10} className="text-orange-400 shrink-0" />
-                      <span className="truncate">{tour.location}</span>
-                    </p>
                   </div>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0 flex items-center gap-1">
+                    <CheckCircle2 size={12} />
+                    <span>{b.status}</span>
+                  </span>
+                </div>
 
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-sm font-black text-[#ff6600]">
-                      {tour.currencySymbol === "so'm" ? `${tour.price.toLocaleString()} so'm` : `$${tour.price}`}
+                {/* Booking Meta Details */}
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <span className="text-[9px] text-slate-400 block font-medium">Yo'nalish:</span>
+                    <span className={`font-semibold truncate block ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                      📍 {b.dest}
                     </span>
-                    <span className="text-[10px] text-slate-400">
-                      {tour.nights}
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-400 block font-medium">Sanalar:</span>
+                    <span className={`font-semibold block ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                      📅 {b.dates}
                     </span>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-slate-700/30 gap-2">
-                <button
-                  onClick={() => onToggleSaveTour(tour.id)}
-                  className="flex items-center gap-1 text-[11px] font-bold text-red-400 hover:text-red-300 transition"
-                >
-                  <Trash2 size={13} />
-                  <span>{language === 'uz' ? "O'chirish" : "Удалить"}</span>
-                </button>
+                {/* Booking Footer Actions */}
+                <div className="flex items-center justify-between pt-2 border-t border-slate-700/30">
+                  <span className="text-sm font-black text-[#ff6600]">
+                    {b.price}
+                  </span>
 
-                <button
-                  onClick={() => onOpenTourDetails(tour)}
-                  className="px-4 py-1.5 bg-[#ff6600] text-white text-xs font-bold rounded-xl shadow active:scale-95 transition flex items-center gap-1"
-                >
-                  <Info size={13} />
-                  <span>{language === 'uz' ? "Batafsil" : "Подробнее"}</span>
-                </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => onDownloadVoucher(b.voucherId)}
+                      className={`px-3 py-1.5 text-[11px] font-bold rounded-xl active:scale-95 transition flex items-center gap-1 border ${
+                        isDark ? 'bg-[#202f4a] hover:bg-[#283b5c] text-white border-transparent' : 'bg-slate-100 text-slate-800 border-slate-200'
+                      }`}
+                    >
+                      <Download size={12} className="text-sky-400" />
+                      <span>{language === 'uz' ? "Vaucher (PDF)" : "Ваучер"}</span>
+                    </button>
+
+                    <button
+                      onClick={() => onCancelBooking(b.id)}
+                      className="px-2.5 py-1.5 text-rose-400 hover:text-rose-300 text-[11px] font-medium active:scale-95 transition"
+                    >
+                      {language === 'uz' ? "Bekor qilish" : "Отменить"}
+                    </button>
+                  </div>
+                </div>
               </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* 2. SAQLANGAN TURLAR (SAVED TOURS) */}
+      {subTab === 'saved' && (
+        <div className="space-y-3">
+          {savedTours.length === 0 ? (
+            <div className={`p-8 text-center rounded-3xl border space-y-2 ${
+              isDark ? 'bg-[#142138] border-[#223352]' : 'bg-white border-slate-200'
+            }`}>
+              <Bookmark size={32} className="text-slate-400 mx-auto" />
+              <h4 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                {language === 'uz' ? "Saqlangan turlar yo'q" : "Нет сохраненных туров"}
+              </h4>
+              <p className="text-xs text-slate-400">
+                {language === 'uz' ? "Qidiruvdan yoqqan turlarni saqlab qo'ying." : "Сохраняйте понравившиеся туры из каталога."}
+              </p>
             </div>
-          ))}
+          ) : (
+            savedTours.map((tour) => (
+              <div
+                key={tour.id}
+                className={`p-3 rounded-2xl border flex items-center justify-between gap-3 shadow-sm ${
+                  isDark ? 'bg-[#142138] border-[#223352]' : 'bg-white border-slate-200'
+                }`}
+              >
+                <img
+                  src={tour.img}
+                  alt={tour.title}
+                  className="w-16 h-16 rounded-xl object-cover shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <h4 className={`text-xs font-black truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {tour.title}
+                  </h4>
+                  <p className="text-[10px] text-slate-400 truncate">
+                    📍 {tour.location}
+                  </p>
+                  <p className="text-xs font-black text-[#ff6600] mt-0.5">
+                    {tour.currencySymbol === "so'm" ? `${tour.price.toLocaleString()} so'm` : `$${tour.price}`}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button
+                    onClick={() => onOpenTourDetails(tour)}
+                    className="px-3 py-1 bg-[#ff6600] text-white text-[10px] font-bold rounded-lg active:scale-95 transition"
+                  >
+                    {language === 'uz' ? "Batafsil" : "Подробнее"}
+                  </button>
+                  <button
+                    onClick={() => onToggleSaveTour(tour.id)}
+                    className="text-[10px] text-rose-400 hover:text-rose-300 py-0.5 active:scale-95 transition text-center"
+                  >
+                    {language === 'uz' ? "O'chirish" : "Удалить"}
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 

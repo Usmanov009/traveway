@@ -169,12 +169,23 @@ export const TourDetailsModal: React.FC<TourDetailsModalProps> = ({
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="px-5 py-2.5 bg-[#ff6600] hover:bg-[#e65c00] active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-500/30 transition"
-          >
-            {language === 'uz' ? 'Yopish' : 'Закрыть'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className={`px-4 py-2.5 rounded-xl font-bold text-xs transition active:scale-95 ${
+                isDark ? 'bg-slate-800 text-slate-300 hover:text-white' : 'bg-slate-200 text-slate-700'
+              }`}
+            >
+              {language === 'uz' ? 'Yopish' : 'Закрыть'}
+            </button>
+            <button
+              onClick={() => onBook(tour)}
+              className="px-5 py-2.5 bg-[#ff6600] hover:bg-[#e65c00] active:scale-95 text-white font-black text-xs rounded-xl shadow-lg shadow-orange-500/30 transition flex items-center gap-1"
+            >
+              <Check size={14} />
+              <span>{language === 'uz' ? 'Bron qilish' : 'Забронировать'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
