@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production / Builds
+build/
+dist/
+coverage/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+*.iml
+.idea/
+tripcraft_mobile/.dart_tool/
+tripcraft_mobile/build/
+tripcraft_mobile/.flutter-plugins*
+
+# Archives & Logs
+*.zip
+*.log
+.DS_Store
+Thumbs.db
+
+# Environment
+.env*
+!.env.example

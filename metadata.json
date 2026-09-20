@@ -1,0 +1,6 @@
+{
+  "name": "TripCraft — Aviasales TMA",
+  "description": "Telegram Mini App for travel packages, hotel charters, and AI ticket itineraries with Aviasales precision.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

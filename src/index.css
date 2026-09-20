@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Physical Ticket Notch Styling */
+.ticket-notch-left {
+  position: absolute;
+  left: -10px;
+  bottom: 42px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--notch-bg, #0f172a);
+  z-index: 10;
+}
+
+.ticket-notch-right {
+  position: absolute;
+  right: -10px;
+  bottom: 42px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--notch-bg, #0f172a);
+  z-index: 10;
+}
+
+.dashed-divider {
+  border-bottom: 2px dashed rgba(100, 116, 139, 0.3);
+}
