@@ -27,6 +27,9 @@ export interface TourPackage {
   flightBlock?: string;
   mealPlan?: string;
   roomType?: string;
+  checkinDate?: string;
+  currencySymbol?: string;
+  starsCount?: number;
 }
 
 export interface Activity {

@@ -377,27 +377,22 @@ export default function App() {
 
         {/* Main Scrollable Viewport */}
         <main className="flex-1 overflow-y-auto no-scrollbar relative p-3.5 space-y-3.5 pb-20">
-          {/* TAB 1: Search & Tour Packages & AI Itinerary */}
+          {/* TAB 1: Search & Kompas Tour Packages */}
           {currentTab === 'search' && (
             <SearchTab
               tourPackages={tourPackages}
-              itinerary={itinerary}
-              setItinerary={setItinerary}
               onToggleSaveTour={handleToggleSaveTour}
               onOpenTourDetails={(tour) => {
                 setSelectedTour(tour);
                 setIsTourModalOpen(true);
               }}
-              onInstantBook={handleBookTour}
-              onOpenTravelersModal={() => setIsTravelersOpen(true)}
-              onSelectTab={setCurrentTab}
               onShowToast={showToast}
               language={language}
               theme={theme}
             />
           )}
 
-          {/* TAB 2: Explore Vibes */}
+          {/* TAB 2: Explore */}
           {currentTab === 'explore' && (
             <ExploreTab
               onSelectDestination={(destName) => {
@@ -415,23 +410,48 @@ export default function App() {
           {/* TAB 3: Hot Flash Deals */}
           {currentTab === 'hot' && (
             <HotSalesTab
-              onBookHotDeal={handleBookHotDeal}
+              onBookHotDeal={(deal) => {
+                const tourFromDeal: TourPackage = {
+                  id: deal.id,
+                  title: deal.title,
+                  location: deal.location,
+                  country: deal.location.split(',').pop()?.trim() || 'BAA',
+                  tag: 'KOMPAS TOUR • FLASH SALE',
+                  badgeType: 'luxury',
+                  is5Star: deal.title.includes('5*'),
+                  rating: 9.5,
+                  nights: deal.nights || '7 kecha',
+                  flight: deal.flight,
+                  price: parseInt(deal.price.replace(/[^0-9]/g, ''), 10) || 450,
+                  oldPrice: parseInt(deal.oldPrice.replace(/[^0-9]/g, ''), 10) || 600,
+                  currencySymbol: '$',
+                  img: deal.img,
+                  saved: false,
+                  airline: deal.flight,
+                  insurance: '$30,000 sug\'urta',
+                  transferIncluded: true,
+                  description: `Kompas Tour (online.uz.kompastour.com) qaynoq aksiyasi: ${deal.title}. Bo'sh joylar soni cheklangan.`,
+                  operator: 'Kompas Tour',
+                  flightBlock: deal.flight,
+                  mealPlan: 'All Inclusive',
+                  roomType: 'Standard Room'
+                };
+                setSelectedTour(tourFromDeal);
+                setIsTourModalOpen(true);
+              }}
               language={language}
               theme={theme}
             />
           )}
 
-          {/* TAB 4: My Trips & Bookings */}
+          {/* TAB 4: Saved Tours */}
           {currentTab === 'trips' && (
             <TripsTab
-              bookings={bookings}
-              savedTours={savedTours}
+              savedTours={tourPackages.filter(p => p.saved)}
               onOpenTourDetails={(tour) => {
                 setSelectedTour(tour);
                 setIsTourModalOpen(true);
               }}
-              onCancelBooking={handleCancelBooking}
-              onDownloadVoucher={handleDownloadVoucher}
               onToggleSaveTour={handleToggleSaveTour}
               onSelectTab={setCurrentTab}
               language={language}
@@ -478,7 +498,7 @@ export default function App() {
         <BottomNavBar
           activeTab={currentTab}
           onSelectTab={setCurrentTab}
-          savedTripsCount={bookings.length}
+          savedTripsCount={tourPackages.filter(p => p.saved).length}
           language={language}
           theme={theme}
         />
@@ -488,7 +508,7 @@ export default function App() {
           tour={selectedTour}
           isOpen={isTourModalOpen}
           onClose={() => setIsTourModalOpen(false)}
-          onBook={handleBookTour}
+          onBook={() => setIsTourModalOpen(false)}
           language={language}
           theme={theme}
         />

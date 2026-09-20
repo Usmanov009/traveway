@@ -48,8 +48,8 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         };
       case 'trips':
         return {
-          title: language === 'uz' ? "Mening Turlarim" : (language === 'ru' ? "Мои Туры" : "My Trips"),
-          subtitle: language === 'uz' ? "Buyurtmalar, vaucherlar va saqlanganlar" : (language === 'ru' ? "Заказы, ваучеры и билеты" : "Bookings, vouchers and passes"),
+          title: language === 'uz' ? "Saqlangan Turlar" : (language === 'ru' ? "Сохраненные Туры" : "Saved Tours"),
+          subtitle: language === 'uz' ? "Tanlangan va yoqqan turpaketlar" : (language === 'ru' ? "Избранные турпакеты" : "Bookmarked tour packages"),
           canBack: true
         };
       case 'profile':

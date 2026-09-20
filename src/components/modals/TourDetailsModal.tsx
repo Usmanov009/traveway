@@ -131,21 +131,22 @@ export const TourDetailsModal: React.FC<TourDetailsModalProps> = ({
         }`}>
           <div>
             <span className="text-[10px] text-slate-400 block font-medium">
-              Rasmiy manba va turoperator
+              Turoperator
             </span>
             <span className="font-bold text-amber-400 text-[11px]">
-              Kompas Tour (online.uz.kompastour.com)
+              Kompas Tour
             </span>
           </div>
-          <a
-            href={tour.operatorUrl || "https://online.uz.kompastour.com/search_tour"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-[11px] font-bold text-sky-400 hover:text-sky-300 transition"
-          >
-            <span>Saytda ko'rish</span>
-            <ExternalLink size={12} />
-          </a>
+          {tour.checkinDate && (
+            <div className="text-right">
+              <span className="text-[10px] text-slate-400 block font-medium">
+                Uchish sanasi
+              </span>
+              <span className="font-bold text-sky-400 text-[11px]">
+                {tour.checkinDate}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Price & Action CTA */}
@@ -158,35 +159,22 @@ export const TourDetailsModal: React.FC<TourDetailsModalProps> = ({
             </span>
             <div className="flex items-baseline gap-1.5">
               <span className="text-2xl font-black text-[#ff6600]">
-                ${tour.price}
+                {tour.currencySymbol === "so'm" ? `${tour.price.toLocaleString()} so'm` : `$${tour.price}`}
               </span>
               {tour.oldPrice && (
                 <span className="text-xs line-through text-slate-500 font-bold">
-                  ${tour.oldPrice}
+                  {tour.currencySymbol === "so'm" ? `${tour.oldPrice.toLocaleString()} so'm` : `$${tour.oldPrice}`}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onClose}
-              className={`px-4 py-2.5 rounded-xl font-bold text-xs transition active:scale-95 ${
-                isDark ? 'bg-slate-800 text-slate-300 hover:text-white' : 'bg-slate-200 text-slate-700'
-              }`}
-            >
-              {language === 'uz' ? 'Yopish' : 'Закрыть'}
-            </button>
-            <a
-              href={tour.operatorUrl || "https://online.uz.kompastour.com/search_tour"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2.5 bg-[#ff6600] hover:bg-[#e65c00] active:scale-95 text-white font-black text-xs rounded-xl shadow-lg shadow-orange-500/30 flex items-center gap-1.5 transition"
-            >
-              <ExternalLink size={14} />
-              <span>{language === 'uz' ? "Saytda ochish" : "Открыть на сайте"}</span>
-            </a>
-          </div>
+          <button
+            onClick={onClose}
+            className="px-5 py-2.5 bg-[#ff6600] hover:bg-[#e65c00] active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-500/30 transition"
+          >
+            {language === 'uz' ? 'Yopish' : 'Закрыть'}
+          </button>
         </div>
       </div>
     </div>
